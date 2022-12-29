@@ -2,5 +2,11 @@
   "AppSyncApiName": "postagram",
   "DynamoDBBillingMode": "PAY_PER_REQUEST",
   "DynamoDBEnableServerSideEncryption": false,
-  "AuthModeLastUpdated": "2022-12-28T19:47:51.638Z"
+  "AuthModeLastUpdated": "2022-12-29T19:12:13.392Z",
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authpostagramdd2c4f52",
+      "Outputs.UserPoolId"
+    ]
+  }
 }

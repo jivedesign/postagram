@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { css } from '@emotion/css';
 import Button from './Button';
 import { v4 as uuid } from 'uuid';
-import { Storage, API } from 'aws-amplify';
+import { Storage, API, Auth } from 'aws-amplify';
 import { createPost } from './graphql/mutations';
 
 /* Initial state to hold form input, saving state */
@@ -43,22 +43,46 @@ export default function CreatePost({
   async function save() {
     try {
       const { name, description, location, image } = formState;
-      if (!name || !description || !location || !image.name) return;
-        updateFormState(currentState => ({ ...currentState, saving: true }));
-        
-        const postId = uuid();
-        const postInfo = { name, description, location, image: formState.image.name, id: postId };
 
-        await Storage.put(formState.image.name, formState.image.fileInfo);
-        await API.graphql({
-          query: createPost, variables: { input: postInfo }
+      if (!name || !description || !location || !image.name) {
+        return;
+      }
+
+      updateFormState(currentState => {
+        return { ...currentState, saving: true};
       });
 
-      updatePosts([...posts, { ...postInfo, image: formState.file }]);
-      updateFormState(currentState => ({ ...currentState, saving: false }));
+      const postId = uuid();
+      const postInfo = {
+        name,
+        description,
+        location,
+        image: formState.image.name,
+        id: postId
+      };
+
+      await Storage.put(
+        formState.image.name,
+        formState.image.fileInfo
+      );
+
+      await API.graphql({
+        query: createPost,
+        variables: {
+          input: postInfo
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS'
+      });
+
+      const { username } = await Auth.currentAuthenticatedUser();
+      updatePosts([ ...posts, { ...postInfo, image: formState.file, owner: username }]);
+      updateFormState(currentState => {
+        return { ...currentState, saving: false}
+      });
       updateOverlayVisibility(false);
+
     } catch (err) {
-      console.log('error: ', err);
+      console.log('error', err);
     }
   }
 

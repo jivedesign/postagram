@@ -6,10 +6,15 @@
     "defaultAuthType": {
       "mode": "API_KEY",
       "expirationTime": 365,
-      "apiKeyExpirationDate": "2023-12-28T19:47:45.583Z",
-      "keyDescription": "postagram api key"
+      "apiKeyExpirationDate": "2023-12-29T19:12:01.322Z",
+      "keyDescription": "public"
     },
     "conflictResolution": {},
-    "additionalAuthTypes": []
+    "additionalAuthTypes": [
+      {
+        "mode": "AMAZON_COGNITO_USER_POOLS",
+        "cognitoUserPoolId": "authpostagramdd2c4f52"
+      }
+    ]
   }
 }

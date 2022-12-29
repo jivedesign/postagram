@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 // import { Storage } from "aws-amplify";
-import { Amplify } from 'aws-amplify';
+import { Amplify, Auth } from 'aws-amplify';
 import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import { css } from '@emotion/css';
 import { API, Storage } from 'aws-amplify';
@@ -18,6 +18,7 @@ Amplify.configure(awsExports);
 
 const Router = (props) => {
   const { user, signOut } = props;
+  const [myPosts, updateMyPosts] = useState([]);
   const [showOverlay, updateOverlayVisibility] = useState(false);
   const [posts, updatePosts] = useState([]);
 
@@ -47,6 +48,10 @@ const Router = (props) => {
 
 
   const setPostState = async (postsArray) => {
+    const user = await Auth.currentAuthenticatedUser();
+    const myPostData = postsArray.filter(post => post.owner === user.username);
+
+    updateMyPosts(myPostData);
     updatePosts(postsArray);
   };
 
@@ -61,6 +66,7 @@ const Router = (props) => {
 
           <Routes >
             <Route exact path="/" element={<Posts posts={posts} />} />
+            <Route exact path="/myposts" element={<Posts posts={myPosts} />} />
             <Route path="/post/:id" element={< Post />} />
           </Routes>
         </div>
